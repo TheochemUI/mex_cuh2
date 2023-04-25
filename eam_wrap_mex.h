@@ -26,8 +26,8 @@ typedef struct {
 } Result;
 
 /* Input Arguments */
-#define R_IN prhs[1]
-#define ATMNRS_IN prhs[2]
+#define R_IN prhs[0]
+#define ATMNRS_IN prhs[1]
 #define BOX_IN prhs[2]
 /* Output Arguments */
 #define EF_OUT plhs[0]
