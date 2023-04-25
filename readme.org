@@ -8,6 +8,7 @@ I find it easier to work in ~C~ for the interface to MATLAB.
 ** Compilation
 
 #+begin_src bash
+tup init
 tup # single build
 ls *.c *.f90 | entr tup # Linux
 watchexec --exts c,f90 -- tup # Cross platform
@@ -19,7 +20,9 @@ gfortran -shared -fPIC -o libcuH2Fort.so eam_isoc.f90 eamroutines.f90
 mex -I$(pwd) -L$(pwd) -lcuh2Fort eam_wrap_mex.c
 #+end_src
 
-Though the ~tup~ formulation is preferred.
+Though the ~tup~ formulation is preferred. There's no default clean but if
+everything is commited, there's always ~git clean -dfxn~, remove ~-n~ if the
+dry-run looks alright.
 
 ** Usage
 The library needs to be accessible to ~matlab~ so the simplest approach is just:
