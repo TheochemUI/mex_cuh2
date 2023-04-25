@@ -1,0 +1,13 @@
+* About
+A lot of inherited code unfortunately uses MATLAB. File I/O interfaces
+are horrible. This has a slightly less horrible implementation (still
+MATLAB though).
+** Usage
+
+#+begin_src bash
+mex eam_wrap_mex.c eam_isoc.f90 eamroutines.f90
+#+end_src
+
+I find it easier to work in ~C~ for the interface to MATLAB.
+* License
+MIT.
