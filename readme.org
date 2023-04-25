@@ -1,7 +1,8 @@
 * About
-A lot of inherited code unfortunately uses MATLAB. File I/O interfaces
-are horrible. This has a slightly less horrible implementation (still
-MATLAB though).
+A lot of inherited code unfortunately uses MATLAB. File I/O interfaces are
+horrible. This has a slightly less horrible implementation. The C-Fortran
+interface is tested in ~potlib~ anyway, so only the bindings need to be checked
+here.
 ** Usage
 
 #+begin_src bash
