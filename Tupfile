@@ -1,0 +1,4 @@
+# Compile Fortran files into shared library
+: eam_isoc.f90 eamroutines.f90 |> gfortran -shared -fPIC %f -o %o |> libcuH2Fort.so
+: eam_wrap_mex.c |> mex -c %f |>%B.o
+: libcuH2Fort.so eam_wrap_mex.o |> mex libcuH2Fort.so eam_wrap_mex.o |> eam_wrap_mex.mexa64
