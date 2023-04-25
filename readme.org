@@ -10,7 +10,7 @@ I find it easier to work in ~C~ for the interface to MATLAB.
 #+begin_src bash
 tup init
 tup # single build
-ls *.c *.f90 | entr tup # Linux
+ls src/*.c src/fortran/*.f90 | entr tup # Linux
 watchexec --exts c,f90 -- tup # Cross platform
 #+end_src
 
