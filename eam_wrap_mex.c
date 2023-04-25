@@ -19,54 +19,95 @@
 
 #include "eam_wrap_mex.h"
 
-#define EF_OUT plhs[0]
-
 /* The gateway function */
-void mexFunction(int nlhs, mxArray *plhs[],
-                 int nrhs, const mxArray *prhs[])
-{
-    double *R, *F, *U;
-    size_t *atomicNrs;
-    size_t m, n, natoms;
+void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
+  /* Ensure valid inputs */
+  if (nrhs != 3) {
+    mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidNumInputs",
+                      "Three input arguments required.");
+  } else if (nlhs > 1) {
+    mexErrMsgIdAndTxt("MATLAB:cuh2pot:maxlhs", "Too many output arguments.");
+  }
 
-    // Ensure valid inputs
-    if (nrhs != 3) {
-        mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidNumInputs", "Three input arguments required.");
-    } else if (nlhs > 2) {
-        mexErrMsgIdAndTxt("MATLAB:cuh2pot:maxlhs", "Too many output arguments.");
+  if (!mxIsDouble(R_IN)) {
+    mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
+                      "First input, positions, must be a real matrix.");
+    mwSize numCols = mxGetN(BOX_IN);
+    if (!(numCols == 3)) {
+      mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
+                        "Positions must be one x,y,z per row.");
     }
+  }
 
-    /* if (!mxIsDouble(R_IN)) { */
-    /*     mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT", "First input, positions, must be a real matrix."); */
-    /* } */
+  if (!(mxIsInt32(ATMNRS_IN))) {
+    mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
+                      "Second input, positions, must be an integer vector.");
+  }
 
-    /* if (!( mxIsInt32(ATMNRS_IN) )) { */
-    /*     mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT", "Second input, positions, must be an integer vector."); */
-    /* } */
-
-    if (!mxIsDouble(BOX_IN)) {
-        mwSize numRows = mxGetM(BOX_IN);
-        mwSize numCols = mxGetN(BOX_IN);
-        if (!(numRows == numCols == 3)){
-            mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT", "Third input, box, must be a real 3x3 matrix.");
-        }
+  if (!mxIsDouble(BOX_IN)) {
+    mwSize numRows = mxGetM(BOX_IN);
+    mwSize numCols = mxGetN(BOX_IN);
+    if (!(numRows == numCols == 3)) {
+      mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
+                        "Third input, box, must be a real 3x3 matrix.");
     }
+  }
 
-    // MATLAB structure for outputs
-    const char *onames[] = {"energy", "forces"};
-    mxArray *oarray = mxCreateStructMatrix(1, 1, 2, onames);
-    // set energy to a double
-    double val = 3.14;
-    mxArray *energy = mxCreateDoubleScalar(val);
-    mxSetField(oarray, 0, "energy", energy);
+  /* Marshall call */
+  /* XXX: This is wrong, the caller needs to fix the order for the matrices */
+  double *R = mxGetPr(R_IN);
+  int *atomicNrs = (int *)mxGetPr(ATMNRS_IN);
+  double *box = mxGetPr(BOX_IN);
+  int natoms = mxGetM(R_IN);
+  int ndim = natoms * 3;
+  mxArray *forces = mxCreateDoubleMatrix(natoms, 3, mxREAL);
+  double *F = mxGetPr(forces);
+  double e_val = 0;
 
-    // set forces to a real matrix
-    mxArray *forces = mxCreateDoubleMatrix(1, 3, mxREAL);
-    double *data = mxGetPr(forces);
-    data[0] = 1.0;
-    data[1] = 3.0;
-    data[2] = 7.0;
-    mxSetField(oarray, 0, "forces", forces);
+  /* Call! */
+  c_force_eam(&natoms, ndim, box, R, F, &e_val);
 
-    EF_OUT = oarray;
+  char buf[100];
+  sprintf(buf, "natoms = %d, ndim = %d\n", natoms, ndim);
+  printf("%s", buf);
+
+  /* Print values */
+  int i, j;
+  printf("F:\n");
+  for (i = 0; i < natoms; i++) {
+    for (j = 0; j < 3; j++) {
+      printf("%f ", F[i * 3 + j]);
+    }
+    printf("\n");
+  }
+
+  printf("R:\n");
+  for (i = 0; i < natoms; i++) {
+    for (j = 0; j < 3; j++) {
+      printf("%f ", R[i * 3 + j]);
+    }
+    printf("\n");
+  }
+
+  printf("e_val: %f\n", e_val);
+
+  printf("box:\n");
+  for (i = 0; i < 3; i++) {
+    for (j = 0; j < 3; j++) {
+      printf("%f ", box[i * 3 + j]);
+    }
+    printf("\n");
+  }
+
+  /* MATLAB structure for outputs */
+  const char *onames[] = {"energy", "forces"};
+  mxArray *oarray = mxCreateStructMatrix(1, 1, 2, onames);
+  // set energy to a double
+  mxArray *energy = mxCreateDoubleScalar(e_val);
+  mxSetField(oarray, 0, "energy", energy);
+
+  /* set forces to a real matrix */
+  mxSetField(oarray, 0, "forces", forces);
+
+  EF_OUT = oarray;
 }
