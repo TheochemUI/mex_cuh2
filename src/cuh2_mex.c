@@ -74,7 +74,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   mxArray *forces = mxCreateDoubleMatrix(natoms, 3, mxREAL);
   double *F = mxGetPr(forces);
   double e_val = 0;
-  // TODO: Count atoms
+  // Count atoms
   int *natms = (int *)malloc(2 * sizeof(int)); // Always Cu, then H
   natms[0] = 0;
   natms[1] = 0;
