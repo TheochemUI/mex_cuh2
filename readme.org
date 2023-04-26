@@ -44,5 +44,10 @@ To save some typing, we can also just load the data.
 LD_LIBRARY_PATH=$(pwd) matlab -nosplash -nodesktop -r "load('data/test_vals')"
 eam_wrap_mex(R, atm_nrs, box)
 #+end_src
+
+Tests, such as they are can be run as:
+#+begin_src bash
+LD_LIBRARY_PATH=$(pwd) matlab -nosplash -nodesktop -batch "runtests"
+#+end_src
 * License
 MIT.
