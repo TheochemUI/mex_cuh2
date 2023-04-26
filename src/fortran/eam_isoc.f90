@@ -15,6 +15,8 @@
       ! write(*,*)"box", box
       ! write(*,*)"R", R
       call force_eam(natms, ndim, box, R, F, U)
+      ! write(*,*)"F", F
+      ! write(*,*)"U", U
 
     end subroutine c_force_eam
   end module eam_wrap
