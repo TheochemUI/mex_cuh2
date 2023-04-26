@@ -1,5 +1,5 @@
 /*
- * eam_wrap_mex.c - an interface to the CuH2 potential of the Jonsson group
+ * cuh2_mex.c - an interface to the CuH2 potential of the Jonsson group
  *
  *  Created on: 25 April 2023
  *      Author: Rohit Goswami
@@ -17,7 +17,7 @@
  * This is a MEX file for MATLAB.
  */
 
-#include "eam_wrap_mex.h"
+#include "cuh2_mex.h"
 
 /* The gateway function */
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {

@@ -4,8 +4,8 @@
  *     Company: University of Iceland
  *     License: MIT
  */
-#ifndef EAM_WRAP_MEX_H_
-#define EAM_WRAP_MEX_H_
+#ifndef CUH2_MEX_H_
+#define CUH2_MEX_H_
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -32,4 +32,4 @@ typedef struct {
 /* Output Arguments */
 #define EF_OUT plhs[0]
 
-#endif // EAM_WRAP_MEX_H_
+#endif // CUH2_MEX_H_
