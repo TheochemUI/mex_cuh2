@@ -4,6 +4,13 @@ horrible. This has a slightly less horrible implementation. The C-Fortran
 interface is tested in ~potlib~ anyway, so only the bindings need to be checked
 here.
 
+
+For a copper slab and hydrogen molecule, the potential is qualitatively correct.
+It captures the fact that when the slab is fixed, there are effectively only two
+degrees of freedom, the distance between the hydrogen atoms, and the distance to
+the slab.
+
+
 I find it easier to work in ~C~ for the interface to MATLAB.
 ** Compilation
 
