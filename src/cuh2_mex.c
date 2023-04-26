@@ -63,8 +63,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   mxArray *forces = mxCreateDoubleMatrix(natoms, 3, mxREAL);
   double *F = mxGetPr(forces);
   double e_val = 0;
-  // Count atoms
-  int natms[2] = {2, 2}; // Always Cu, then H
+  // TODO: Count atoms
+  int *natms = (int*)malloc(2 * sizeof(int)); // Always Cu, then H
+  natms[0] = 2;
+  natms[1] = 2;
 
   /* We need to transpose the inputs we got */
   /* Transpose R */
@@ -79,7 +81,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   double box[3] = {box_in[0], box_in[4], box_in[8]};
 
   /* Call! */
-  c_force_eam(&natms, ndim, box, R_transposed, F, &e_val);
+  c_force_eam(natms, ndim, box, R_transposed, F, &e_val);
 
 #ifdef DEBUG
   /* Print values */
