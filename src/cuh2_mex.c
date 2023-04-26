@@ -32,6 +32,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   if (!mxIsDouble(R_IN)) {
     mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
                       "First input, positions, must be a real matrix.");
+  } else {
     mwSize numCols = mxGetN(R_IN);
     if (!(numCols == 3)) {
       mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
@@ -42,12 +43,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   if (!(mxIsInt32(ATMNRS_IN))) {
     mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
                       "Second input, positions, must be an integer vector.");
+  } else {
+    mwSize numElems = mxGetNumberOfElements(ATMNRS_IN);
+    if (!(numElems == mxGetM(R_IN))) {
+      mexErrMsgIdAndTxt(
+          "MATLAB:cuh2pot:invalidT",
+          "Atomic number vector not the same size as the number of atoms.");
+    }
   }
 
   if (!mxIsDouble(BOX_IN)) {
+    mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
+                      "Third input, box, must be a real 3x3 matrix.");
+  } else {
     mwSize numRows = mxGetM(BOX_IN);
     mwSize numCols = mxGetN(BOX_IN);
-    if (!(numRows == numCols == 3)) {
+    if (numCols != 3 || numRows != 3) {
       mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
                         "Third input, box, must be a real 3x3 matrix.");
     }
@@ -101,19 +112,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   sprintf(buf, "natoms = %d, ndim = %d\nbox = %f %f %f\n", natoms, ndim, box[0],
           box[1], box[2]);
   printf("%s", buf);
-  int i, j;
   printf("F:\n");
-  for (i = 0; i < natoms; i++) {
-    for (j = 0; j < 3; j++) {
-      printf("%f ", F[i * 3 + j]);
+  for (int idx = 0; idx < natoms; idx++) {
+    for (jdx = 0; jdx < 3; jdx++) {
+      printf("%f ", F[idx * 3 + jdx]);
     }
     printf("\n");
   }
 
   printf("R:\n");
-  for (i = 0; i < natoms; i++) {
-    for (j = 0; j < 3; j++) {
-      printf("%f ", R_transposed[i * 3 + j]);
+  for (int idx = 0; idx < natoms; idx++) {
+    for (jdx = 0; jdx < 3; jdx++) {
+      printf("%f ", R_transposed[idx * 3 + jdx]);
     }
     printf("\n");
   }
