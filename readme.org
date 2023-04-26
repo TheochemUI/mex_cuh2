@@ -17,7 +17,7 @@ watchexec --exts c,f90 -- tup # Cross platform
 To really get down to it, this works too:
 #+begin_src bash
 gfortran -shared -fPIC -o libcuH2Fort.so eam_isoc.f90 eamroutines.f90
-mex -I$(pwd) -L$(pwd) -lcuh2Fort eam_wrap_mex.c
+mex -I$(pwd) -L$(pwd) -lcuH2Fort cuh2_mex.c
 #+end_src
 
 Though the ~tup~ formulation is preferred. There's no default clean but if
