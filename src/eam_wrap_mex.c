@@ -32,7 +32,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   if (!mxIsDouble(R_IN)) {
     mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
                       "First input, positions, must be a real matrix.");
-    mwSize numCols = mxGetN(BOX_IN);
+    mwSize numCols = mxGetN(R_IN);
     if (!(numCols == 3)) {
       mexErrMsgIdAndTxt("MATLAB:cuh2pot:invalidT",
                         "Positions must be one x,y,z per row.");
@@ -57,14 +57,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   /* XXX: This is wrong, the caller needs to fix the order for the matrices */
   double *R = mxGetPr(R_IN);
   int *atomicNrs = (int *)mxGetPr(ATMNRS_IN);
-  double *box = mxGetPr(BOX_IN);
+  double *box_in = mxGetPr(BOX_IN);
   int natoms = mxGetM(R_IN);
   int ndim = natoms * 3;
   mxArray *forces = mxCreateDoubleMatrix(natoms, 3, mxREAL);
   double *F = mxGetPr(forces);
   double e_val = 0;
   // Count atoms
-  int natms[2]={2, 2}; // Always Cu, then H
+  int natms[2] = {2, 2}; // Always Cu, then H
 
   /* We need to transpose the inputs we got */
   /* Transpose R */
@@ -75,23 +75,18 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
       R_transposed[j * mxGetN(R_IN) + i] = R[i * mxGetM(R_IN) + j];
     }
   }
-  /* Transpose box */
-  double *box_transposed =
-      (double *)malloc(mxGetN(BOX_IN) * mxGetM(BOX_IN) * sizeof(double));
-  for (int i = 0; i < mxGetN(BOX_IN); i++) {
-    for (int j = 0; j < mxGetM(BOX_IN); j++) {
-      box_transposed[j * mxGetN(BOX_IN) + i] = box[i * mxGetM(BOX_IN) + j];
-    }
-  }
+  /* Only diagonal boxes are supported for CuH2 */
+  double box[3] = {box_in[0], box_in[4], box_in[8]};
 
   /* Call! */
-  c_force_eam(&natms, ndim, box_transposed, R_transposed, F, &e_val);
+  c_force_eam(&natms, ndim, box, R_transposed, F, &e_val);
 
-  char buf[100];
-  sprintf(buf, "natoms = %d, ndim = %d\n", natoms, ndim);
-  printf("%s", buf);
-
+#ifdef DEBUG
   /* Print values */
+  char buf[100];
+  sprintf(buf, "natoms = %d, ndim = %d\nbox = %f %f %f\n", natoms, ndim, box[0],
+          box[1], box[2]);
+  printf("%s", buf);
   int i, j;
   printf("F:\n");
   for (i = 0; i < natoms; i++) {
@@ -110,14 +105,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   }
 
   printf("e_val: %f\n", e_val);
-
-  printf("box:\n");
-  for (i = 0; i < 3; i++) {
-    for (j = 0; j < 3; j++) {
-      printf("%f ", box[i * 3 + j]);
-    }
-    printf("\n");
-  }
+#endif
 
   /* MATLAB structure for outputs */
   const char *onames[] = {"energy", "forces"};
