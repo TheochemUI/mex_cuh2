@@ -64,8 +64,26 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   double *F = mxGetPr(forces);
   double e_val = 0;
 
+  /* We need to transpose the inputs we got */
+  /* Transpose R */
+  double *R_transposed =
+      (double *)malloc(mxGetN(R_IN) * mxGetM(R_IN) * sizeof(double));
+  for (int i = 0; i < mxGetN(R_IN); i++) {
+    for (int j = 0; j < mxGetM(R_IN); j++) {
+      R_transposed[j * mxGetN(R_IN) + i] = R[i * mxGetM(R_IN) + j];
+    }
+  }
+  /* Transpose box */
+  double *box_transposed =
+      (double *)malloc(mxGetN(BOX_IN) * mxGetM(BOX_IN) * sizeof(double));
+  for (int i = 0; i < mxGetN(BOX_IN); i++) {
+    for (int j = 0; j < mxGetM(BOX_IN); j++) {
+      box_transposed[j * mxGetN(BOX_IN) + i] = box[i * mxGetM(BOX_IN) + j];
+    }
+  }
+
   /* Call! */
-  c_force_eam(&natoms, ndim, box, R, F, &e_val);
+  c_force_eam(&natoms, ndim, box_transposed, R_transposed, F, &e_val);
 
   char buf[100];
   sprintf(buf, "natoms = %d, ndim = %d\n", natoms, ndim);
@@ -84,7 +102,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   printf("R:\n");
   for (i = 0; i < natoms; i++) {
     for (j = 0; j < 3; j++) {
-      printf("%f ", R[i * 3 + j]);
+      printf("%f ", R_transposed[i * 3 + j]);
     }
     printf("\n");
   }
