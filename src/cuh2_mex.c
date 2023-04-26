@@ -64,17 +64,29 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
   double *F = mxGetPr(forces);
   double e_val = 0;
   // TODO: Count atoms
-  int *natms = (int*)malloc(2 * sizeof(int)); // Always Cu, then H
-  natms[0] = 2;
-  natms[1] = 2;
+  int *natms = (int *)malloc(2 * sizeof(int)); // Always Cu, then H
+  natms[0] = 0;
+  natms[1] = 0;
+  // Simple counter
+  for (int idx = 0; idx < natoms; idx++) {
+    if (atomicNrs[idx] == 29) {
+      natms[0] += 1; // Cu
+    } else if (atomicNrs[idx] == 1) {
+      natms[1] += 1; // H
+    } else {
+      mexErrMsgIdAndTxt(
+          "MATLAB:cuh2pot:invalidT",
+          "Only 29(Cu) and 1 (H), are allowed in the atomic numbers input");
+    }
+  }
 
   /* We need to transpose the inputs we got */
   /* Transpose R */
   double *R_transposed =
       (double *)malloc(mxGetN(R_IN) * mxGetM(R_IN) * sizeof(double));
-  for (int i = 0; i < mxGetN(R_IN); i++) {
-    for (int j = 0; j < mxGetM(R_IN); j++) {
-      R_transposed[j * mxGetN(R_IN) + i] = R[i * mxGetM(R_IN) + j];
+  for (int idx = 0; idx < mxGetN(R_IN); idx++) {
+    for (int jdx = 0; jdx < mxGetM(R_IN); jdx++) {
+      R_transposed[jdx * mxGetN(R_IN) + idx] = R[idx * mxGetM(R_IN) + jdx];
     }
   }
   /* Only diagonal boxes are supported for CuH2 */
