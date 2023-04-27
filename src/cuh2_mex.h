@@ -19,12 +19,6 @@ extern void c_force_eam(int *natms, int ndim, double *box, double *R, double *F,
 /* Entry point for MATLAB */
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]);
 
-/* MATLAB variable helpers */
-typedef struct {
-  double energy;
-  double *forces;
-} Result;
-
 /* Input Arguments */
 #define R_IN prhs[0]
 #define ATMNRS_IN prhs[1]
